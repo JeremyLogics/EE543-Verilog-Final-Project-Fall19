@@ -1,72 +1,5 @@
-//`timescale 1ns / 1ps
-// `default nettype none
-//////////////////////////////////////////////////////////////////////////////////
-// Company: University of South Alabama ECE department, EE-543
-// Engineer: 
-// 
-// Create Date: 11/17/2019 06:25:03 AM
-// Design Name: 4-bit multiplier
-// Module Name: MUL4JLapane
-// Project Name: HDL/Verilog course Final Project
-// Target Devices: 
-// Tool Versions: 
-// Description: Design a 4-bit multiplier using gate level modeling
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-// Quartus text editor:
-// CTRL+H: find and replace
-// Alt+left-select: column selection
-// 
-// Sublime text 3 notes: 
-// CTRL+Shift+/ : comment block selection shortcut
-//
-//
-//
-//////////////////////////////////////////////////////////////////////////////////
-
-// ** myAND, AND1x4, and FADD4 are commented out as they were not used in this design. 
-
-/*module myAND (input1,input2,result); 
-input input1, input2; //and gate inputs, the first and second inputs. 
-output result; //"result" is the output of the and gate
-and g1 (result, input1, input2);
-endmodule*/
- 
-/*module AND1x4 (a, b, out);
-input [3:0] a;
-input b;
-output [3:0] out;
-
-and (out[0], a[0], b);
-and (out[1], a[1], b);
-and (out[2], a[2], b);
-and (out[3], a[3], b);
-
-endmodule*/
-
-/*module FADD4 (fourin1, fourin2, sum, carryin, carryout);
-input  [3:0] fourin1, fourin2; //first and second inputs
-input  carryin;
-output [3:0] sum;
-output carryout;
-
-wire carry1, carry2, carry3; //internal carries
-
-FADD1 g1  (fourin1[0], fourin2[0], sum[0], carryin, carry1);
-FADD1 g2  (fourin1[1], fourin2[1], sum[1], carry1, carry2);
-FADD1 g3  (fourin1[2], fourin2[2], sum[2], carry2, carry3);
-FADD1 g4  (fourin1[3], fourin2[3], sum[3], carry3, carryout);
-
-endmodule*/
-
-//FADD1 COMPLETE
+//FADD1 
 module FADD1 (in1, in2, s, cin, cout); 
-//using different naming conventions to better distinguish code, since this will be instanced in the 4-bit full adder
 input  in1, in2, cin; //port declaration in1 and in2 are inputs a and b for the adder, cin is Carry in
 output s, cout; //port dec S is sum and cout is carry out
 wire   out1, out2, out3; //internal variables between gates
@@ -78,7 +11,6 @@ and g4 (out3, in1, in2);
 or g5  (cout, out2, out3);
 
 endmodule
-
 
 //TOP MODULE
 module JLAPANEMUL4 (inputa, inputb, Output_P_eq_ab); 
@@ -95,7 +27,7 @@ and (Output_P_eq_ab[0], inputa[0], inputb[0]);
 and (internal_x[0], inputa[1], inputb[0]);
 and (internal_x[1], inputa[2], inputb[0]);
 and (internal_x[2], inputa[3], inputb[0]);
-//group0 and+FADD COMPLETE
+//group0 and+FADD 
 and (internal_x[4], inputa[0], inputb[1]); //0, x wires go from AND gate to FADD module
 and (internal_x[5], inputa[1], inputb[1]); //0
 and (internal_x[6], inputa[2], inputb[1]); //0
@@ -128,6 +60,4 @@ FADD1 C2 (internal_z[1], internal_z[5], Output_P_eq_ab[4], carry[6], carry[7]); 
 FADD1 C3 (internal_z[2], internal_z[6], Output_P_eq_ab[5], carry[7], carry[8]); //2
 FADD1 C4 (internal_z[3], internal_z[7], Output_P_eq_ab[6], carry[8], Output_P_eq_ab[7]);  //2
 
-
-
-endmodule
+endmodule 
