@@ -14,7 +14,7 @@ endmodule
 
 //TOP MODULE
 module JLAPANEMUL4 (inputa, inputb, Output_P_eq_ab); 
-//using different naming convention for readbility, this module is the top module for the 4-bit multiplier design, using instances of FADD1, FADD4, AND1x4 
+//using different naming convention for readbility, top module for the 4-bit multiplier design, using instances of FADD1, FADD4, AND1x4 
 input [3:0] inputa, inputb;
 output [7:0] Output_P_eq_ab;
 wire [7:0] internal_x, internal_y, internal_z; // internal wires between ANDs and FADD, see //#
