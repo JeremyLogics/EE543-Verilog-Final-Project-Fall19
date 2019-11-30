@@ -34,7 +34,7 @@ and (internal_x[6], inputa[2], inputb[1]); //0
 and (internal_x[7], inputa[3], inputb[1]); //0
 
 FADD1 A1 (internal_x[0],internal_x[4], Output_P_eq_ab[1], 1'b0, carry[0]); //0 internal_x[#] wires are inputs
-FADD1 A2 (internal_x[1],internal_x[5], internal_y[0], carry[0], carry[1]); //0 //internal_y[#] wires are outputs to the next set of FADDs
+FADD1 A2 (internal_x[1],internal_x[5], internal_y[0], carry[0], carry[1]); //0 //internal_y[#] wires are outputs to next set of FADDs
 FADD1 A3 (internal_x[2],internal_x[6], internal_y[1], carry[1], carry[2]); //0
 FADD1 A4 (internal_x[3],internal_x[7], internal_y[2], carry[2], internal_y[3]); //0
 
