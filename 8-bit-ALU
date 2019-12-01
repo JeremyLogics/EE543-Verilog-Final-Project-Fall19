@@ -1,0 +1,331 @@
+/*
+
+**The control signal corresponds directly to the encoding of instruction set architecture (ISA) P37X and ARM ISA.
+
+**If any control signal other those specified is given to the ALU, the ALU should set all 8 output bits to zero.
+
+**The NOT operation returns the logical inverse of the second ALU input (input2), and it ignores the first input (input1).
+
+**The SUB operation computes output = input1 - input2.
+
+**The RSB operation computes output = input2 - input1.
+
+**For the MUL operations, the four higher bits of input1 and the four higher bits of input2 will perform multiplication (i.e. 4 MSBs perform multiplication).
+
+**For the shift operations, input1 is the value to be shifted and the three lower bits of input2 
+determine the amount of the shift (0 to 7 binary digits). For example, if input1 = 8’b10001111 
+and input2 = 8’b1110010, for the instruction SRL, we shift input1 to the right by 2 bits, so the result is 8’b00100011.
+
+**For the rotate operations, input1 is the value to be rotated and the three lower 
+bits of input2 determine the amount of the rotation (0 to 7 binary digits). 
+For example, if input1 = 8’b10001111 and input2 = 8’b1110010, for the instruction ROR,
+we rotate input1 to the right by 2 bits, so the result is 8’b11100011.
+
+
+**Implementation: The ALU should instantiate a single 8-bit adder (also used for subtraction, 
+feel free to use the design from our lectures or homework), a 4-bit multiplier (from Part 1), 
+logical gates, a left shifter, a right shifter, a left rotator, and a right rotator module. 
+Using the outputs from these modules and some combinational logic to generate all 12 possible values. 
+Finally, use a multiplexer to select the correct output.
+
+*/
+
+//Addition
+module FADD1 
+	(
+	in1, 
+	in2, 
+	s, 
+	cin, 
+	cout
+	); 
+input  in1, in2, cin; //port declaration in1 and in2 are inputs a and b for the adder, cin is Carry in
+output s, cout; //port dec S is sum and cout is carry out
+wire   out1, out2, out3; //internal variables between gates
+//using built in-gates, the following gate-level modeling arranges a 1-bit full adder
+xor g1 (out1, in1, in2);
+xor g2 (s, out1, cin);
+and g3 (out2, out1, cin);
+and g4 (out3, in1, in2);
+or g5  (cout, out2, out3);
+endmodule
+
+module FADDSUB8
+	(
+	input_a, 
+	input_b, 
+	sum,
+	sel, 
+	//carry_in, 
+	carry_out
+	);
+input 	[7:0] 	input_a, input_b;
+//input 			carry_in;
+input	[1:0]	sel; //if sel is 2'b01, sum = a+b; 2'b10, sum = a-b, 2'b11, sum = b-a. 
+output 	[7:0] 	sum;
+output 			carry_out;
+
+wire [6:0] internal_carry;
+wire [7:0] xor_input_a, xor_input_b;
+wire not_sel, andselb, andsela; //not_sel = !sel[1], andselb = not_sel AND sel0, andsela = sel1 AND sel0. 
+
+not (not_sel, sel[0]);
+//and (andselb, not_sel, sel[0]);
+and (andsela, sel[1], sel[0]);
+
+xor xa1	(xor_input_a[0], andsela, input_a[0]);
+xor xa2	(xor_input_a[1], andsela, input_a[1]);
+xor xa3	(xor_input_a[2], andsela, input_a[2]);
+xor xa4	(xor_input_a[3], andsela, input_a[3]);
+xor xa5	(xor_input_a[4], andsela, input_a[4]);
+xor xa6	(xor_input_a[5], andsela, input_a[5]);
+xor xa7	(xor_input_a[6], andsela, input_a[6]);
+xor xa8	(xor_input_a[7], andsela, input_a[7]); 
+
+xor xb1	(xor_input_b[0], not_sel, input_b[0]);
+xor xb2	(xor_input_b[1], not_sel, input_b[1]);
+xor xb3	(xor_input_b[2], not_sel, input_b[2]);
+xor xb4	(xor_input_b[3], not_sel, input_b[3]);
+xor xb5	(xor_input_b[4], not_sel, input_b[4]);
+xor xb6	(xor_input_b[5], not_sel, input_b[5]);
+xor xb7	(xor_input_b[6], not_sel, input_b[6]);
+xor xb8	(xor_input_b[7], not_sel, input_b[7]); 
+
+FADD1 A1 (xor_input_a[0], 		xor_input_b[0],			sum[0], 		sel[1], 			internal_carry[0]);
+FADD1 A2 (xor_input_a[1], 		xor_input_b[1],			sum[1], 		internal_carry[0], 	internal_carry[1]);
+FADD1 A3 (xor_input_a[2], 		xor_input_b[2],			sum[2], 		internal_carry[1], 	internal_carry[2]);
+FADD1 A4 (xor_input_a[3], 		xor_input_b[3],			sum[3], 		internal_carry[2], 	internal_carry[3]);
+FADD1 A5 (xor_input_a[4], 		xor_input_b[4],			sum[4], 		internal_carry[3], 	internal_carry[4]);
+FADD1 A6 (xor_input_a[5], 		xor_input_b[5],			sum[5], 		internal_carry[4], 	internal_carry[5]);
+FADD1 A7 (xor_input_a[6], 		xor_input_b[6],			sum[6], 		internal_carry[5], 	internal_carry[6]);
+FADD1 A8 (xor_input_a[7], 		xor_input_b[7],			sum[7], 		internal_carry[6], 	carry_out);
+
+endmodule
+
+/*
+//Subtraction
+
+module SUB1
+	(
+	in1,
+	in2,
+	bin,
+	bout,
+	diff
+	);
+input 	in1, in2, bin;
+output 	diff, bout;
+
+wire internal_not_1, internal_not_2, internal_xor, internal_and_1, internal_and_2;
+
+xor subXOR1 (internal_xor, in1, in2);
+not subNOT1 (internal_not_1, in1);
+and subAND1 (internal_and_1, in2, internal_not_1);
+xor subXOR2 (diff, internal_xor, bin);
+not subNOT2 (internal_not_2, internal_xor);
+and subAND2 (internal_and_2, bin, internal_not_2);
+or 	subOR   (bout, internal_and_2, internal_and_1);
+endmodule
+
+module SUB8
+	(
+	input_a,
+	input_b,
+	borrow_in,
+	borrow_out,
+	difference
+	);
+input 	[7:0] 	input_a, input_b;
+input			borrow_in;
+output			borrow_out;
+output	[7:0]	difference;
+
+wire	[6:0]	internal_borrow;
+		
+SUB1 S1 (input_a[0], input_b[0], borrow_in, 			internal_borrow[0], difference[0]);
+SUB1 S2 (input_a[1], input_b[1], internal_borrow[0], 	internal_borrow[1], difference[1]);
+SUB1 S3 (input_a[2], input_b[2], internal_borrow[1], 	internal_borrow[2], difference[2]);
+SUB1 S4 (input_a[3], input_b[3], internal_borrow[2], 	internal_borrow[3], difference[3]);
+SUB1 S5 (input_a[4], input_b[4], internal_borrow[3], 	internal_borrow[4], difference[4]);
+SUB1 S6 (input_a[5], input_b[5], internal_borrow[4],	internal_borrow[5], difference[5]);
+SUB1 S7 (input_a[6], input_b[6], internal_borrow[5], 	internal_borrow[6], difference[6]);
+SUB1 S8 (input_a[7], input_b[7], internal_borrow[6], 	borrow_out,			difference[7]);
+
+
+endmodule
+*/
+//Reverse Subtraction
+
+//Multiplication
+
+//FADD1 duplicate
+/*module FADD1 (in1, in2, s, cin, cout); 
+input  in1, in2, cin; //port declaration in1 and in2 are inputs a and b for the adder, cin is Carry in
+output s, cout; //port dec S is sum and cout is carry out
+wire   out1, out2, out3; //internal variables between gates
+//using built in-gates, the following gate-level modeling arranges a 1-bit full adder
+xor g1 (out1, in1, in2);
+xor g2 (s, out1, cin);
+and g3 (out2, out1, cin);
+and g4 (out3, in1, in2);
+or g5  (cout, out2, out3);
+
+endmodule*/
+
+//TOP MODULE
+module JLAPANEMUL4 (inputa, inputb, Output_P_eq_ab); 
+//using different naming convention for readability 
+input [3:0] inputa, inputb;
+output [7:0] Output_P_eq_ab;
+wire [7:0] internal_x, internal_y, internal_z; // internal wires between ANDs and FADD, see //#
+wire [8:0] carry;
+
+assign internal_x[3] = 1'b0;
+
+//inputs initial and
+and (Output_P_eq_ab[0], inputa[0], inputb[0]);
+and (internal_x[0], inputa[1], inputb[0]);
+and (internal_x[1], inputa[2], inputb[0]);
+and (internal_x[2], inputa[3], inputb[0]);
+//group0 and+FADD 
+and (internal_x[4], inputa[0], inputb[1]); //0, x wires go from AND gate to FADD module
+and (internal_x[5], inputa[1], inputb[1]); //0
+and (internal_x[6], inputa[2], inputb[1]); //0
+and (internal_x[7], inputa[3], inputb[1]); //0
+
+FADD1 A1 (internal_x[0],internal_x[4], Output_P_eq_ab[1], 1'b0, carry[0]); //0 internal_x[#] //wires are inputs
+FADD1 A2 (internal_x[1],internal_x[5], internal_y[0], carry[0], carry[1]); //0 //internal_y[#] //wires are outputs to next set of FADDs
+FADD1 A3 (internal_x[2],internal_x[6], internal_y[1], carry[1], carry[2]); //0
+FADD1 A4 (internal_x[3],internal_x[7], internal_y[2], carry[2], internal_y[3]); //0
+
+//group1 and+FADD 
+and (internal_y[4], inputa[0], inputb[2]); //1 internal_y[#] wires are outputs to FADD1 B#
+and (internal_y[5], inputa[1], inputb[2]); //1
+and (internal_y[6], inputa[2], inputb[2]); //1
+and (internal_y[7], inputa[3], inputb[2]); //1
+
+FADD1 B1 (internal_y[0],internal_y[4], Output_P_eq_ab[2], 1'b0, carry[3]); //1
+FADD1 B2 (internal_y[1],internal_y[5], internal_z[0], carry[3], carry[4]); //1
+FADD1 B3 (internal_y[2],internal_y[6], internal_z[1], carry[4], carry[5]); //1
+FADD1 B4 (internal_y[3],internal_y[7], internal_z[2], carry[5], internal_z[3]); //1
+
+//group2 and+FADD
+and (internal_z[4], inputa[0], inputb[3]); //2 internal_z[#] wires are outputs to FADD1 C#
+and (internal_z[5], inputa[1], inputb[3]); //2
+and (internal_z[6], inputa[2], inputb[3]); //2
+and (internal_z[7], inputa[3], inputb[3]); //2
+
+FADD1 C1 (internal_z[0], internal_z[4], Output_P_eq_ab[3], 1'b0, carry[6]); //2
+FADD1 C2 (internal_z[1], internal_z[5], Output_P_eq_ab[4], carry[6], carry[7]); //2
+FADD1 C3 (internal_z[2], internal_z[6], Output_P_eq_ab[5], carry[7], carry[8]); //2
+FADD1 C4 (internal_z[3], internal_z[7], Output_P_eq_ab[6], carry[8], Output_P_eq_ab[7]);  //2
+
+endmodule
+
+
+//Bitwise NOR
+
+module NOR8 (input_a, input_b, output_ab_nor);
+
+input 	[7:0]	input_a, input_b;
+
+output 	[7:0]	output_ab_nor;
+
+nor NOR1 (output_ab_nor[0], input_a[0], input_b[0]);
+nor NOR2 (output_ab_nor[1], input_a[1], input_b[1]);
+nor NOR3 (output_ab_nor[2], input_a[2], input_b[2]);
+nor NOR4 (output_ab_nor[3], input_a[3], input_b[3]);
+nor NOR5 (output_ab_nor[4], input_a[4], input_b[4]);
+nor NOR6 (output_ab_nor[5], input_a[5], input_b[5]);
+nor NOR7 (output_ab_nor[6], input_a[6], input_b[6]);
+nor NOR8 (output_ab_nor[7], input_a[7], input_b[7]);
+
+endmodule
+
+
+//Bitwise NOT
+
+module NOT8 (input_b, output_b_NOT);
+
+input 	[7:0]	input_b;
+
+output 	[7:0]	output_b_NOT;
+
+not NOT1 (output_b_NOT[0], input_b[0]);
+not NOT2 (output_b_NOT[1], input_b[1]);
+not NOT3 (output_b_NOT[2], input_b[2]);
+not NOT4 (output_b_NOT[3], input_b[3]);
+not NOT5 (output_b_NOT[4], input_b[4]);
+not NOT6 (output_b_NOT[5], input_b[5]);
+not NOT7 (output_b_NOT[6], input_b[6]);
+not NOT8 (output_b_NOT[7], input_b[7]);
+
+endmodule
+
+//Bitwise NAND
+
+module NAND8 (input_a, input_b, output_ab_nand);
+
+input 	[7:0]	input_a, input_b;
+
+output 	[7:0]	output_ab_nand;
+
+nand NAND1 (output_ab_nand[0], input_a[0], input_b[0]);
+nand NAND2 (output_ab_nand[1], input_a[1], input_b[1]);
+nand NAND3 (output_ab_nand[2], input_a[2], input_b[2]);
+nand NAND4 (output_ab_nand[3], input_a[3], input_b[3]);
+nand NAND5 (output_ab_nand[4], input_a[4], input_b[4]);
+nand NAND6 (output_ab_nand[5], input_a[5], input_b[5]);
+nand NAND7 (output_ab_nand[6], input_a[6], input_b[6]);
+nand NAND8 (output_ab_nand[7], input_a[7], input_b[7]);
+
+endmodule
+
+//Bitwise XNOR
+
+module XNOR8 (input_a, input_b, output_ab_xnor);
+
+input 	[7:0]	input_a, input_b;
+
+output 	[7:0]	output_ab_xnor;
+
+xnor XNOR1 (output_ab_xnor[0], input_a[0], input_b[0]);
+xnor XNOR2 (output_ab_xnor[1], input_a[1], input_b[1]);
+xnor XNOR3 (output_ab_xnor[2], input_a[2], input_b[2]);
+xnor XNOR4 (output_ab_xnor[3], input_a[3], input_b[3]);
+xnor XNOR5 (output_ab_xnor[4], input_a[4], input_b[4]);
+xnor XNOR6 (output_ab_xnor[5], input_a[5], input_b[5]);
+xnor XNOR7 (output_ab_xnor[6], input_a[6], input_b[6]);
+xnor XNOR8 (output_ab_xnor[7], input_a[7], input_b[7]);
+
+endmodule
+//D-flip-flop
+
+
+
+//Shift Right or Left Logical
+
+module Shift_Right (input_a, input_b, output_a_shifted);
+
+input 	[7:0]	input_a, input_b;
+output	[7:0]	output_a_shifted;
+
+wire	
+
+
+
+
+//Rotate Right
+
+//Rotate Left
+
+
+
+//Top Module
+module JLapane_8_bit_ALU
+	(
+	select
+	);
+input [3:0] select;
+ 
+endmodule
