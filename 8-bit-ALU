@@ -30,6 +30,242 @@ Finally, use a multiplexer to select the correct output.
 
 */
 
+//Top ALU Module, unused control signals output 0000 0000
+module JLapane_8_bit_ALU
+	(
+    input_a_top,    // first input
+    input_b_top,    // second input
+	control,        // selects function desired
+    output_top,     // output from ALU, muxed using 8 of the 8-to-1 mux module.
+    carry_out_top   // carry out output
+	);
+input   [3:0]   control;
+input   [7:0]   input_a_top, input_b_top;
+
+output  [7:0]   output_top;
+output          carry_out_top;
+
+wire            carry_out_add, carry_out_sub, carry_out_rsb;
+//these wires map from arithmetic or logical modules to 8 mux16 inputs
+wire    [7:0]   add_out, 
+                sub_out,
+                rsb_out,
+                mul_out,
+                nor_out,
+                not_out,
+                nand_out,
+                xnor_out,
+                srl_out,
+                sll_out,
+                ror_out,
+                rol_out
+                ;
+
+// control 0000 unused, unused control signals output 0000 0000
+
+
+
+// control 0001 ADD S = A + B (if sel is 2'b01, sum = a+b; 2'b10, sum = a-b, 2'b11, sum = b-a.)
+FADDSUB8 ADD_top (input_a_top, input_b_top, 2'b01, add_out, carry_out_add);
+
+// control 0010 SUB S = A - B (if sel is 2'b01, sum = a+b; 2'b10, sum = a-b, 2'b11, sum = b-a.)
+FADDSUB8 SUB_top (input_a_top, input_b_top, 2'b10, sub_out, carry_out_sub);
+
+// control 0011 SUB S = A - B (if sel is 2'b01, sum = a+b; 2'b10, sum = a-b, 2'b11, sum = b-a.)
+FADDSUB8 RSB_top (input_a_top, input_b_top, 2'b11, rsb_out, carry_out_rsb);
+
+
+// control 0100 MUL S [7:0] = A [7:4] * B [7:4]
+JLAPANEMUL4 MUL_top (input_a_top,  input_b_top, mul_out);
+
+
+
+// control 0101 not used, unused control signals output 0000 0000
+// control 0110 not used, unused control signals output 0000 0000
+// control 0111 not used, unused control signals output 0000 0000
+
+
+
+// control 1000 bitwise NOR: module NOR8 (input_a, input_b, output_ab_nor);
+NOR8 NOR_top    (input_a_top, input_b_top, nor_out);
+
+// control 1001 bitwise NOT: module NOT8 (input_b, output_b_NOT);
+NOT8 NOT_top    (input_b_top, not_out);
+
+// control 1010 bitwise NAND: module NAND8 (input_a, input_b, output_ab_nand);
+NAND8 NAND_top  (input_a_top, input_b_top, nand_out);
+
+// control 1011 bitwise XNOR: module XNOR8 (input_a, input_b, output_ab_xnor);
+XNOR8 XNOR_top  (input_a_top, input_b_top, xnor_out);
+
+// control 1100 shift right logical: module Shift_Right (input_a, input_b, output_a_shifted);
+Shift_Right SRL_top (input_a_top, input_b_top, srl_out);
+
+// control 1101 shift left logical: module Shift_Left (input_a, input_b, output_a_shifted_left);
+Shift_Left SLL_top  (input_a_top, input_b_top, sll_out);
+
+// control 1110 rotate right: module Rotate_Right (input_a, input_b, output_a_rotated_right);
+Rotate_Right ROR_top (input_a_top, input_b_top, ror_out);
+
+// control 1111 rotate left: module Rotate_Left (input_a, input_b, output_a_rotated_left);
+Rotate_Left ROL_top (input_a_top, input_b_top, rol_out);
+
+
+//  mod    name             output          control  
+    MUX16   TopMux_0        (
+                            1'b0,            //0000 control signal not used
+                            add_out [0],     //0001
+                            sub_out [0],     //0010
+                            rsb_out [0],     //0011
+                            mul_out [0],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [0],     //1000
+                            not_out [0],     //1001
+                            nand_out[0],     //1010
+                            xnor_out[0],     //1011
+                            srl_out [0],     //1100
+                            sll_out [0],     //1101
+                            ror_out [0],     //1110
+                            rol_out [0],     //1111
+                            );
+
+    MUX16   TopMux_1        (
+                            1'b0,            //0000 control signal not used
+                            add_out [1],     //0001
+                            sub_out [1],     //0010
+                            rsb_out [1],     //0011
+                            mul_out [1],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [1],     //1000
+                            not_out [1],     //1001
+                            nand_out[1],     //1010
+                            xnor_out[1],     //1011
+                            srl_out [1],     //1100
+                            sll_out [1],     //1101
+                            ror_out [1],     //1110
+                            rol_out [1],     //1111
+                            );
+
+    MUX16   TopMux_2        (
+                            1'b0,            //0000 control signal not used
+                            add_out [2],     //0001
+                            sub_out [2],     //0010
+                            rsb_out [2],     //0011
+                            mul_out [2],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [2],     //1000
+                            not_out [2],     //1001
+                            nand_out[2],     //1010
+                            xnor_out[2],     //1011
+                            srl_out [2],     //1100
+                            sll_out [2],     //1101
+                            ror_out [2],     //1110
+                            rol_out [2],     //1111
+                            );
+
+    MUX16   TopMux_3        (
+                            1'b0,            //0000 control signal not used
+                            add_out [3],     //0001
+                            sub_out [3],     //0010
+                            rsb_out [3],     //0011
+                            mul_out [3],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [3],     //1000
+                            not_out [3],     //1001
+                            nand_out[3],     //1010
+                            xnor_out[3],     //1011
+                            srl_out [3],     //1100
+                            sll_out [3],     //1101
+                            ror_out [3],     //1110
+                            rol_out [3],     //1111
+                            );
+
+    MUX16   TopMux_4        (
+                            1'b0,            //0000 control signal not used
+                            add_out [4],     //0001
+                            sub_out [4],     //0010
+                            rsb_out [4],     //0011
+                            mul_out [4],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [4],     //1000
+                            not_out [4],     //1001
+                            nand_out[4],     //1010
+                            xnor_out[4],     //1011
+                            srl_out [4],     //1100
+                            sll_out [4],     //1101
+                            ror_out [4],     //1110
+                            rol_out [4],     //1111
+                            );                                                                                    
+
+    MUX16   TopMux_5        (
+                            1'b0,            //0000 control signal not used
+                            add_out [5],     //0001
+                            sub_out [5],     //0010
+                            rsb_out [5],     //0011
+                            mul_out [5],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [5],     //1000
+                            not_out [5],     //1001
+                            nand_out[5],     //1010
+                            xnor_out[5],     //1011
+                            srl_out [5],     //1100
+                            sll_out [5],     //1101
+                            ror_out [5],     //1110
+                            rol_out [5],     //1111
+                            );
+
+    MUX16   TopMux_6        (
+                            1'b0,            //0000 control signal not used
+                            add_out [6],     //0001
+                            sub_out [6],     //0010
+                            rsb_out [6],     //0011
+                            mul_out [6],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [6],     //1000
+                            not_out [6],     //1001
+                            nand_out[6],     //1010
+                            xnor_out[6],     //1011
+                            srl_out [6],     //1100
+                            sll_out [6],     //1101
+                            ror_out [6],     //1110
+                            rol_out [6],     //1111
+                            );
+
+    MUX16   TopMux_7        (
+                            1'b0,            //0000 control signal not used
+                            add_out [7],     //0001
+                            sub_out [7],     //0010
+                            rsb_out [7],     //0011
+                            mul_out [7],     //0100
+                            1'b0,            //0101 control signal not used
+                            1'b0,            //0110 control signal not used
+                            1'b0,            //0111 control signal not used
+                            nor_out [7],     //1000
+                            not_out [7],     //1001
+                            nand_out[7],     //1010
+                            xnor_out[7],     //1011
+                            srl_out [7],     //1100
+                            sll_out [7],     //1101
+                            ror_out [7],     //1110
+                            rol_out [7],     //1111
+                            );                                                        
+
+endmodule
+
 //Addition
 module FADD1 
 	(
@@ -135,7 +371,7 @@ module SUB8
 	borrow_out,
 	difference
 	);
-input 	[7:0] 	input_a, input_b;
+input 	[7:0] 	input_a, input_b; 
 input			borrow_in;
 output			borrow_out;
 output	[7:0]	difference;
@@ -172,7 +408,7 @@ or g5  (cout, out2, out3);
 
 endmodule*/
 
-//TOP MODULE
+//MUL MODULE
 module JLAPANEMUL4 (inputa, inputb, Output_P_eq_ab); 
 //using different naming convention for readability 
 input [3:0] inputa, inputb;
@@ -299,33 +535,856 @@ xnor XNOR7 (output_ab_xnor[6], input_a[6], input_b[6]);
 xnor XNOR8 (output_ab_xnor[7], input_a[7], input_b[7]);
 
 endmodule
-//D-flip-flop
+// D-flip-flop should have been used for a SRL/SLL but the project required we select number of shifts from input_b_top [2:0], so not allowed to depend on clock.
+// Probably should have implemented a counter to disable the DFFs instead of lots of nets and muxes.
+
+//2-to-1 mux, this is directly from class notes
+
+
+module MUX2 (i0, i1, sel, out); //your declaration determines how to put the port list when you make instance 
+//input and output ports declaration
+input i0, i1, sel;
+output out;
+
+//local variables
+wire o1, o2, o3;
+
+//build-in gate
+not g1 (o1, sel);
+and g2 (o2, i1, sel);
+and g3 (o3, o1, i0);
+or g4 (out, o2, o3);
+
+endmodule
+
+//8-to-1 mux, this is directly from class notes
+
+module MUX8 (d0, d1, d2, d3, d4, d5, d6, d7, s0, s1, s2, y); 
+//input and output ports declaration
+input d0, d1, d2, d3, d4, d5, d6, d7, s0, s1, s2;
+output y;
+
+//local variables
+wire o1, o2, o3, o4, o5, o6;
+
+//make instance of MUX2
+MUX2 g1 (d0, d1, s0, o1);
+MUX2 g2 (d2, d3, s0, o2);
+MUX2 g3 (d4, d5, s0, o3);
+MUX2 g4 (d6, d7, s0, o4);
+MUX2 g5 (o1, o2, s1, o5);
+MUX2 g6 (o3, o4, s1, o6);
+MUX2 g7 (o5, o6, s2, y); 
+
+endmodule
 
 
 
 //Shift Right or Left Logical
+//shift right 8 is not allowed, but shift right 0 is allowed
 
-module Shift_Right (input_a, input_b, output_a_shifted);
+module Shift_Right (
+     input_a, 
+     input_b, 
+     output_a_shifted
+     );
 
-input 	[7:0]	input_a, input_b;
+input 	[7:0]	input_a,
+                input_b;
 output	[7:0]	output_a_shifted;
 
-wire	
+
+wire     [7:0]   shift_right_one, 
+                shift_right_two,
+                shift_right_three,
+                shift_right_four,
+                shift_right_five,
+                shift_right_six,
+                shift_right_seven; //shift right 8 is not allowed, but shift right 0 is allowed
+
+//wire    [2:0]   select;
+//wire    [7:0]   outputwire;
 
 
 
+assign shift_right_one[0] = input_a[1];
+assign shift_right_one[1] = input_a[2];
+assign shift_right_one[2] = input_a[3];
+assign shift_right_one[3] = input_a[4];
+assign shift_right_one[4] = input_a[5];
+assign shift_right_one[5] = input_a[6];
+assign shift_right_one[6] = input_a[7];
+assign shift_right_one[7] = 1'b0;
 
-//Rotate Right
+assign shift_right_two[0] = input_a[2];
+assign shift_right_two[1] = input_a[3];
+assign shift_right_two[2] = input_a[4];
+assign shift_right_two[3] = input_a[5];
+assign shift_right_two[4] = input_a[6];
+assign shift_right_two[5] = input_a[7];
+assign shift_right_two[6] = 1'b0;
+assign shift_right_two[7] = 1'b0;
 
-//Rotate Left
+assign shift_right_three[0] = input_a[3];
+assign shift_right_three[1] = input_a[4];
+assign shift_right_three[2] = input_a[5];
+assign shift_right_three[3] = input_a[6];
+assign shift_right_three[4] = input_a[7];
+assign shift_right_three[5] = 1'b0;
+assign shift_right_three[6] = 1'b0;
+assign shift_right_three[7] = 1'b0;
+
+assign shift_right_four[0] = input_a[4];
+assign shift_right_four[1] = input_a[5];
+assign shift_right_four[2] = input_a[6];
+assign shift_right_four[3] = input_a[7];
+assign shift_right_four[4] = 1'b0;
+assign shift_right_four[5] = 1'b0;
+assign shift_right_four[6] = 1'b0;
+assign shift_right_four[7] = 1'b0;
+
+assign shift_right_five[0] = input_a[5];
+assign shift_right_five[1] = input_a[6];
+assign shift_right_five[2] = input_a[7];
+assign shift_right_five[3] = 1'b0;
+assign shift_right_five[4] = 1'b0;
+assign shift_right_five[5] = 1'b0;
+assign shift_right_five[6] = 1'b0;
+assign shift_right_five[7] = 1'b0;
+
+assign shift_right_six[0] = input_a[6];
+assign shift_right_six[1] = input_a[7];
+assign shift_right_six[2] = 1'b0;
+assign shift_right_six[3] = 1'b0;
+assign shift_right_six[4] = 1'b0;
+assign shift_right_six[5] = 1'b0;
+assign shift_right_six[6] = 1'b0;
+assign shift_right_six[7] = 1'b0;
+
+assign shift_right_seven[0] = input_a[7];
+assign shift_right_seven[1] = 1'b0;
+assign shift_right_seven[2] = 1'b0;
+assign shift_right_seven[3] = 1'b0;
+assign shift_right_seven[4] = 1'b0;
+assign shift_right_seven[5] = 1'b0;
+assign shift_right_seven[6] = 1'b0;
+assign shift_right_seven[7] = 1'b0;
 
 
+MUX8 OUTPUT0MUX (input_a            [0], // if input_b [2:0] == 3'b000
+                shift_right_one     [0], // 3'b001
+                shift_right_two     [0], // 3'b010
+                shift_right_three   [0], // 3'b011
+                shift_right_four    [0], // 3'b100
+                shift_right_five    [0], // 3'b101
+                shift_right_six     [0], // 3'b110
+                shift_right_seven   [0], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted[0]);
 
-//Top Module
-module JLapane_8_bit_ALU
-	(
-	select
-	);
-input [3:0] select;
- 
+MUX8 OUTPUT1MUX (input_a            [1], // 3'b000
+                shift_right_one     [1], // 3'b001
+                shift_right_two     [1], // 3'b010
+                shift_right_three   [1], // 3'b011
+                shift_right_four    [1], // 3'b100
+                shift_right_five    [1], // 3'b101
+                shift_right_six     [1], // 3'b110
+                shift_right_seven   [1], // 3'b111
+                input_b[0],
+                input_b[1], 
+                input_b[2], 
+                output_a_shifted[1]);
+
+MUX8 OUTPUT2MUX (input_a            [2], // 3'b000
+                shift_right_one     [2], // 3'b001
+                shift_right_two     [2], // 3'b010
+                shift_right_three   [2], // 3'b011
+                shift_right_four    [2], // 3'b100
+                shift_right_five    [2], // 3'b101
+                shift_right_six     [2], // 3'b110
+                shift_right_seven   [2], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted[2]);
+
+MUX8 OUTPUT3MUX (input_a            [3], // 3'b000
+                shift_right_one     [3], // 3'b001
+                shift_right_two     [3], // 3'b010
+                shift_right_three   [3], // 3'b011
+                shift_right_four    [3], // 3'b100
+                shift_right_five    [3], // 3'b101
+                shift_right_six     [3], // 3'b110
+                shift_right_seven   [3], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted[3]);
+
+MUX8 OUTPUT4MUX (input_a            [4], // 3'b000
+                shift_right_one     [4], // 3'b001
+                shift_right_two     [4], // 3'b010
+                shift_right_three   [4], // 3'b011
+                shift_right_four    [4], // 3'b100
+                shift_right_five    [4], // 3'b101
+                shift_right_six     [4], // 3'b110
+                shift_right_seven   [4], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted[4]);
+
+MUX8 OUTPUT5MUX (input_a            [5], // 3'b000
+                shift_right_one     [5], // 3'b001
+                shift_right_two     [5], // 3'b010
+                shift_right_three   [5], // 3'b011
+                shift_right_four    [5], // 3'b100
+                shift_right_five    [5], // 3'b101
+                shift_right_six     [5], // 3'b110
+                shift_right_seven   [5], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted[5]);
+
+MUX8 OUTPUT6MUX (input_a            [6], // 3'b000
+                shift_right_one     [6], // 3'b001
+                shift_right_two     [6], // 3'b010
+                shift_right_three   [6], // 3'b011
+                shift_right_four    [6], // 3'b100
+                shift_right_five    [6], // 3'b101
+                shift_right_six     [6], // 3'b110
+                shift_right_seven   [6], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2], 
+                output_a_shifted[6]);
+
+MUX8 OUTPUT7MUX (input_a            [7], // 3'b000
+                shift_right_one     [7], // 3'b001
+                shift_right_two     [7], // 3'b010
+                shift_right_three   [7], // 3'b011
+                shift_right_four    [7], // 3'b100
+                shift_right_five    [7], // 3'b101
+                shift_right_six     [7], // 3'b110
+                shift_right_seven   [7], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted[7]);
+
 endmodule
+
+
+// Left Shifter, this is usually an array of DFF but designer struggled to handle unique outputs of a DFF array driven by a clock in time to submit,
+// a requirement was to have the shifting amount determined by input_b [2:0] for this segment of the project.
+module Shift_Left (
+    input_a,
+    input_b,
+    output_a_shifted_left
+    );
+
+input 	[7:0]	input_a,
+                input_b;
+output	[7:0]	output_a_shifted_left;
+
+
+wire     [7:0]   shift_left_one, 
+                shift_left_two,
+                shift_left_three,
+                shift_left_four,
+                shift_left_five,
+                shift_left_six,
+                shift_left_seven; //shift left 8 is not allowed, but shift left 0 is allowed
+
+
+assign shift_left_one[0] = 1'b0;
+assign shift_left_one[1] = input_a[0];
+assign shift_left_one[2] = input_a[1];
+assign shift_left_one[3] = input_a[2];
+assign shift_left_one[4] = input_a[3];
+assign shift_left_one[5] = input_a[4];
+assign shift_left_one[6] = input_a[5];
+assign shift_left_one[7] = input_a[6];
+
+assign shift_left_two[0] = 1'b0;
+assign shift_left_two[1] = 1'b0;
+assign shift_left_two[2] = input_a[0];
+assign shift_left_two[3] = input_a[1];
+assign shift_left_two[4] = input_a[2];
+assign shift_left_two[5] = input_a[3];
+assign shift_left_two[6] = input_a[4];
+assign shift_left_two[7] = input_a[5];
+
+assign shift_left_three[0] = 1'b0;
+assign shift_left_three[1] = 1'b0;
+assign shift_left_three[2] = 1'b0;
+assign shift_left_three[3] = input_a[0];
+assign shift_left_three[4] = input_a[1];
+assign shift_left_three[5] = input_a[2];
+assign shift_left_three[6] = input_a[3];
+assign shift_left_three[7] = input_a[4];
+
+assign shift_left_four[0] = 1'b0;
+assign shift_left_four[1] = 1'b0;
+assign shift_left_four[2] = 1'b0;
+assign shift_left_four[3] = 1'b0;
+assign shift_left_four[4] = input_a[0];
+assign shift_left_four[5] = input_a[1];
+assign shift_left_four[6] = input_a[2];
+assign shift_left_four[7] = input_a[3];
+
+assign shift_left_five[0] = 1'b0;
+assign shift_left_five[1] = 1'b0;
+assign shift_left_five[2] = 1'b0;
+assign shift_left_five[3] = 1'b0;
+assign shift_left_five[4] = 1'b0;
+assign shift_left_five[5] = input_a[0];
+assign shift_left_five[6] = input_a[1];
+assign shift_left_five[7] = input_a[2];
+
+assign shift_left_six[0] = 1'b0;
+assign shift_left_six[1] = 1'b0;
+assign shift_left_six[2] = 1'b0;
+assign shift_left_six[3] = 1'b0;
+assign shift_left_six[4] = 1'b0;
+assign shift_left_six[5] = 1'b0;
+assign shift_left_six[6] = input_a[0];
+assign shift_left_six[7] = input_a[1];
+
+assign shift_left_seven[0] = 1'b0;
+assign shift_left_seven[1] = 1'b0;
+assign shift_left_seven[2] = 1'b0;
+assign shift_left_seven[3] = 1'b0;
+assign shift_left_seven[4] = 1'b0;
+assign shift_left_seven[5] = 1'b0;
+assign shift_left_seven[6] = 1'b0;
+assign shift_left_seven[7] = input_a[0];
+
+
+MUX8 OUTPUT0MUXleft (input_a       [0], // if input_b [2:0] == 3'b000
+                shift_left_one     [0], // 3'b001
+                shift_left_two     [0], // 3'b010
+                shift_left_three   [0], // 3'b011
+                shift_left_four    [0], // 3'b100
+                shift_left_five    [0], // 3'b101
+                shift_left_six     [0], // 3'b110
+                shift_left_seven   [0], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted_left[0]);
+
+MUX8 OUTPUT1MUXleft (input_a       [1], // 3'b000
+                shift_left_one     [1], // 3'b001
+                shift_left_two     [1], // 3'b010
+                shift_left_three   [1], // 3'b011
+                shift_left_four    [1], // 3'b100
+                shift_left_five    [1], // 3'b101
+                shift_left_six     [1], // 3'b110
+                shift_left_seven   [1], // 3'b111
+                input_b[0],
+                input_b[1], 
+                input_b[2], 
+                output_a_shifted_left[1]);
+
+MUX8 OUTPUT2MUXleft (input_a       [2], // 3'b000
+                shift_left_one     [2], // 3'b001
+                shift_left_two     [2], // 3'b010
+                shift_left_three   [2], // 3'b011
+                shift_left_four    [2], // 3'b100
+                shift_left_five    [2], // 3'b101
+                shift_left_six     [2], // 3'b110
+                shift_left_seven   [2], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted_left[2]);
+
+MUX8 OUTPUT3MUXleft (input_a       [3], // 3'b000
+                shift_left_one     [3], // 3'b001
+                shift_left_two     [3], // 3'b010
+                shift_left_three   [3], // 3'b011
+                shift_left_four    [3], // 3'b100
+                shift_left_five    [3], // 3'b101
+                shift_left_six     [3], // 3'b110
+                shift_left_seven   [3], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted_left[3]);
+
+MUX8 OUTPUT4MUXleft (input_a       [4], // 3'b000
+                shift_left_one     [4], // 3'b001
+                shift_left_two     [4], // 3'b010
+                shift_left_three   [4], // 3'b011
+                shift_left_four    [4], // 3'b100
+                shift_left_five    [4], // 3'b101
+                shift_left_six     [4], // 3'b110
+                shift_left_seven   [4], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted_left[4]);
+
+MUX8 OUTPUT5MUXleft (input_a       [5], // 3'b000
+                shift_left_one     [5], // 3'b001
+                shift_left_two     [5], // 3'b010
+                shift_left_three   [5], // 3'b011
+                shift_left_four    [5], // 3'b100
+                shift_left_five    [5], // 3'b101
+                shift_left_six     [5], // 3'b110
+                shift_left_seven   [5], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted_left[5]);
+
+MUX8 OUTPUT6MUXleft (input_a       [6], // 3'b000
+                shift_left_one     [6], // 3'b001
+                shift_left_two     [6], // 3'b010
+                shift_left_three   [6], // 3'b011
+                shift_left_four    [6], // 3'b100
+                shift_left_five    [6], // 3'b101
+                shift_left_six     [6], // 3'b110
+                shift_left_seven   [6], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2], 
+                output_a_shifted_left[6]);
+
+MUX8 OUTPUT7MUXleft (input_a       [7], // 3'b000
+                shift_left_one     [7], // 3'b001
+                shift_left_two     [7], // 3'b010
+                shift_left_three   [7], // 3'b011
+                shift_left_four    [7], // 3'b100
+                shift_left_five    [7], // 3'b101
+                shift_left_six     [7], // 3'b110
+                shift_left_seven   [7], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_shifted_left[7]);
+
+endmodule
+
+
+module Rotate_Right (
+    input_a, 
+    input_b, 
+    output_a_rotated_right
+    );
+
+input 	[7:0]	input_a,
+                input_b;
+output	[7:0]	output_a_rotated_right;
+
+
+wire     [7:0]   rotate_right_one, 
+                rotate_right_two,
+                rotate_right_three,
+                rotate_right_four,
+                rotate_right_five,
+                rotate_right_six,
+                rotate_right_seven; //rotate right 8 is not allowed, but rotate right 0 is allowed
+
+
+assign rotate_right_one[0] = input_a[1];
+assign rotate_right_one[1] = input_a[2];
+assign rotate_right_one[2] = input_a[3];
+assign rotate_right_one[3] = input_a[4];
+assign rotate_right_one[4] = input_a[5];
+assign rotate_right_one[5] = input_a[6];
+assign rotate_right_one[6] = input_a[7];
+assign rotate_right_one[7] = input_a[0];
+
+assign rotate_right_two[0] = input_a[2];
+assign rotate_right_two[1] = input_a[3];
+assign rotate_right_two[2] = input_a[4];
+assign rotate_right_two[3] = input_a[5];
+assign rotate_right_two[4] = input_a[6];
+assign rotate_right_two[5] = input_a[7];
+assign rotate_right_two[6] = input_a[0];
+assign rotate_right_two[7] = input_a[1];
+
+assign rotate_right_three[0] = input_a[3];
+assign rotate_right_three[1] = input_a[4];
+assign rotate_right_three[2] = input_a[5];
+assign rotate_right_three[3] = input_a[6];
+assign rotate_right_three[4] = input_a[7];
+assign rotate_right_three[5] = input_a[0];
+assign rotate_right_three[6] = input_a[1];
+assign rotate_right_three[7] = input_a[2];
+
+assign rotate_right_four[0] = input_a[4];
+assign rotate_right_four[1] = input_a[5];
+assign rotate_right_four[2] = input_a[6];
+assign rotate_right_four[3] = input_a[7];
+assign rotate_right_four[4] = input_a[0];
+assign rotate_right_four[5] = input_a[1];
+assign rotate_right_four[6] = input_a[2];
+assign rotate_right_four[7] = input_a[3];
+
+assign rotate_right_five[0] = input_a[5];
+assign rotate_right_five[1] = input_a[6];
+assign rotate_right_five[2] = input_a[7];
+assign rotate_right_five[3] = input_a[0];
+assign rotate_right_five[4] = input_a[1];
+assign rotate_right_five[5] = input_a[2];
+assign rotate_right_five[6] = input_a[3];
+assign rotate_right_five[7] = input_a[4];
+
+assign rotate_right_six[0] = input_a[6];
+assign rotate_right_six[1] = input_a[7];
+assign rotate_right_six[2] = input_a[0];
+assign rotate_right_six[3] = input_a[1];
+assign rotate_right_six[4] = input_a[2];
+assign rotate_right_six[5] = input_a[3];
+assign rotate_right_six[6] = input_a[4];
+assign rotate_right_six[7] = input_a[5];
+
+assign rotate_right_seven[0] = input_a[7];
+assign rotate_right_seven[1] = input_a[0];
+assign rotate_right_seven[2] = input_a[1];
+assign rotate_right_seven[3] = input_a[2];
+assign rotate_right_seven[4] = input_a[3];
+assign rotate_right_seven[5] = input_a[4];
+assign rotate_right_seven[6] = input_a[5];
+assign rotate_right_seven[7] = input_a[6];
+
+
+MUX8 OUTPUT0MUXrotateright (input_a  [0], // if input_b [2:0] == 3'b000
+                rotate_right_one     [0], // 3'b001
+                rotate_right_two     [0], // 3'b010
+                rotate_right_three   [0], // 3'b011
+                rotate_right_four    [0], // 3'b100
+                rotate_right_five    [0], // 3'b101
+                rotate_right_six     [0], // 3'b110
+                rotate_right_seven   [0], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_right[0]);
+
+MUX8 OUTPUT1MUXrotateright (input_a  [1], // 3'b000
+                rotate_right_one     [1], // 3'b001
+                rotate_right_two     [1], // 3'b010
+                rotate_right_three   [1], // 3'b011
+                rotate_right_four    [1], // 3'b100
+                rotate_right_five    [1], // 3'b101
+                rotate_right_six     [1], // 3'b110
+                rotate_right_seven   [1], // 3'b111
+                input_b[0],
+                input_b[1], 
+                input_b[2], 
+                output_a_rotated_right[1]);
+
+MUX8 OUTPUT2MUXrotateright (input_a  [2], // 3'b000
+                rotate_right_one     [2], // 3'b001
+                rotate_right_two     [2], // 3'b010
+                rotate_right_three   [2], // 3'b011
+                rotate_right_four    [2], // 3'b100
+                rotate_right_five    [2], // 3'b101
+                rotate_right_six     [2], // 3'b110
+                rotate_right_seven   [2], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_right[2]);
+
+MUX8 OUTPUT3MUXrotateright (input_a  [3], // 3'b000
+                rotate_right_one     [3], // 3'b001
+                rotate_right_two     [3], // 3'b010
+                rotate_right_three   [3], // 3'b011
+                rotate_right_four    [3], // 3'b100
+                rotate_right_five    [3], // 3'b101
+                rotate_right_six     [3], // 3'b110
+                rotate_right_seven   [3], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_right[3]);
+
+MUX8 OUTPUT4MUXrotateright (input_a  [4], // 3'b000
+                rotate_right_one     [4], // 3'b001
+                rotate_right_two     [4], // 3'b010
+                rotate_right_three   [4], // 3'b011
+                rotate_right_four    [4], // 3'b100
+                rotate_right_five    [4], // 3'b101
+                rotate_right_six     [4], // 3'b110
+                rotate_right_seven   [4], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_right[4]);
+
+MUX8 OUTPUT5MUXrotateright (input_a  [5], // 3'b000
+                rotate_right_one     [5], // 3'b001
+                rotate_right_two     [5], // 3'b010
+                rotate_right_three   [5], // 3'b011
+                rotate_right_four    [5], // 3'b100
+                rotate_right_five    [5], // 3'b101
+                rotate_right_six     [5], // 3'b110
+                rotate_right_seven   [5], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_right[5]);
+
+MUX8 OUTPUT6MUXrotateright (input_a  [6], // 3'b000
+                rotate_right_one     [6], // 3'b001
+                rotate_right_two     [6], // 3'b010
+                rotate_right_three   [6], // 3'b011
+                rotate_right_four    [6], // 3'b100
+                rotate_right_five    [6], // 3'b101
+                rotate_right_six     [6], // 3'b110
+                rotate_right_seven   [6], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2], 
+                output_a_rotated_right[6]);
+
+MUX8 OUTPUT7MUXrotateright (input_a  [7], // 3'b000
+                rotate_right_one     [7], // 3'b001
+                rotate_right_two     [7], // 3'b010
+                rotate_right_three   [7], // 3'b011
+                rotate_right_four    [7], // 3'b100
+                rotate_right_five    [7], // 3'b101
+                rotate_right_six     [7], // 3'b110
+                rotate_right_seven   [7], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_right[7]);
+
+endmodule
+
+module Rotate_Left (
+    input_a, 
+    input_b, 
+    output_a_rotated_left
+    );
+
+input 	[7:0]	input_a,
+                input_b;
+output	[7:0]	output_a_rotated_left;
+
+
+wire     [7:0]   rotate_left_one, 
+                rotate_left_two,
+                rotate_left_three,
+                rotate_left_four,
+                rotate_left_five,
+                rotate_left_six,
+                rotate_left_seven; //rotate left 8 is not allowed, but rotate left 0 is allowed
+
+
+assign rotate_left_one[0] = input_a[7];
+assign rotate_left_one[1] = input_a[0];
+assign rotate_left_one[2] = input_a[1];
+assign rotate_left_one[3] = input_a[2];
+assign rotate_left_one[4] = input_a[3];
+assign rotate_left_one[5] = input_a[4];
+assign rotate_left_one[6] = input_a[5];
+assign rotate_left_one[7] = input_a[6];
+
+assign rotate_left_two[0] = input_a[6];
+assign rotate_left_two[1] = input_a[7];
+assign rotate_left_two[2] = input_a[0];
+assign rotate_left_two[3] = input_a[1];
+assign rotate_left_two[4] = input_a[2];
+assign rotate_left_two[5] = input_a[3];
+assign rotate_left_two[6] = input_a[4];
+assign rotate_left_two[7] = input_a[5];
+
+assign rotate_left_three[0] = input_a[5];
+assign rotate_left_three[1] = input_a[6];
+assign rotate_left_three[2] = input_a[7];
+assign rotate_left_three[3] = input_a[0];
+assign rotate_left_three[4] = input_a[1];
+assign rotate_left_three[5] = input_a[2];
+assign rotate_left_three[6] = input_a[3];
+assign rotate_left_three[7] = input_a[4];
+
+assign rotate_left_four[0] = input_a[4];
+assign rotate_left_four[1] = input_a[5];
+assign rotate_left_four[2] = input_a[6];
+assign rotate_left_four[3] = input_a[7];
+assign rotate_left_four[4] = input_a[0];
+assign rotate_left_four[5] = input_a[1];
+assign rotate_left_four[6] = input_a[2];
+assign rotate_left_four[7] = input_a[3];
+
+assign rotate_left_five[0] = input_a[3];
+assign rotate_left_five[1] = input_a[4];
+assign rotate_left_five[2] = input_a[5];
+assign rotate_left_five[3] = input_a[6];
+assign rotate_left_five[4] = input_a[7];
+assign rotate_left_five[5] = input_a[0];
+assign rotate_left_five[6] = input_a[1];
+assign rotate_left_five[7] = input_a[2];
+
+assign rotate_left_six[0] = input_a[2];
+assign rotate_left_six[1] = input_a[3];
+assign rotate_left_six[2] = input_a[4];
+assign rotate_left_six[3] = input_a[5];
+assign rotate_left_six[4] = input_a[6];
+assign rotate_left_six[5] = input_a[7];
+assign rotate_left_six[6] = input_a[0];
+assign rotate_left_six[7] = input_a[1];
+
+assign rotate_left_seven[0] = input_a[1];
+assign rotate_left_seven[1] = input_a[2];
+assign rotate_left_seven[2] = input_a[3];
+assign rotate_left_seven[3] = input_a[4];
+assign rotate_left_seven[4] = input_a[5];
+assign rotate_left_seven[5] = input_a[6];
+assign rotate_left_seven[6] = input_a[7];
+assign rotate_left_seven[7] = input_a[0];
+
+
+MUX8 OUTPUT0MUXrotateleft (input_a  [0], // if input_b [2:0] == 3'b000
+                rotate_left_one     [0], // 3'b001
+                rotate_left_two     [0], // 3'b010
+                rotate_left_three   [0], // 3'b011
+                rotate_left_four    [0], // 3'b100
+                rotate_left_five    [0], // 3'b101
+                rotate_left_six     [0], // 3'b110
+                rotate_left_seven   [0], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_left[0]);
+
+MUX8 OUTPUT1MUXrotateleft (input_a  [1], // 3'b000
+                rotate_left_one     [1], // 3'b001
+                rotate_left_two     [1], // 3'b010
+                rotate_left_three   [1], // 3'b011
+                rotate_left_four    [1], // 3'b100
+                rotate_left_five    [1], // 3'b101
+                rotate_left_six     [1], // 3'b110
+                rotate_left_seven   [1], // 3'b111
+                input_b[0],
+                input_b[1], 
+                input_b[2], 
+                output_a_rotated_left[1]);
+
+MUX8 OUTPUT2MUXrotateleft (input_a  [2], // 3'b000
+                rotate_left_one     [2], // 3'b001
+                rotate_left_two     [2], // 3'b010
+                rotate_left_three   [2], // 3'b011
+                rotate_left_four    [2], // 3'b100
+                rotate_left_five    [2], // 3'b101
+                rotate_left_six     [2], // 3'b110
+                rotate_left_seven   [2], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_left[2]);
+
+MUX8 OUTPUT3MUXrotateleft (input_a  [3], // 3'b000
+                rotate_left_one     [3], // 3'b001
+                rotate_left_two     [3], // 3'b010
+                rotate_left_three   [3], // 3'b011
+                rotate_left_four    [3], // 3'b100
+                rotate_left_five    [3], // 3'b101
+                rotate_left_six     [3], // 3'b110
+                rotate_left_seven   [3], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_left[3]);
+
+MUX8 OUTPUT4MUXrotateleft (input_a  [4], // 3'b000
+                rotate_left_one     [4], // 3'b001
+                rotate_left_two     [4], // 3'b010
+                rotate_left_three   [4], // 3'b011
+                rotate_left_four    [4], // 3'b100
+                rotate_left_five    [4], // 3'b101
+                rotate_left_six     [4], // 3'b110
+                rotate_left_seven   [4], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_left[4]);
+
+MUX8 OUTPUT5MUXrotateleft (input_a  [5], // 3'b000
+                rotate_left_one     [5], // 3'b001
+                rotate_left_two     [5], // 3'b010
+                rotate_left_three   [5], // 3'b011
+                rotate_left_four    [5], // 3'b100
+                rotate_left_five    [5], // 3'b101
+                rotate_left_six     [5], // 3'b110
+                rotate_left_seven   [5], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_left[5]);
+
+MUX8 OUTPUT6MUXrotateleft (input_a  [6], // 3'b000
+                rotate_left_one     [6], // 3'b001
+                rotate_left_two     [6], // 3'b010
+                rotate_left_three   [6], // 3'b011
+                rotate_left_four    [6], // 3'b100
+                rotate_left_five    [6], // 3'b101
+                rotate_left_six     [6], // 3'b110
+                rotate_left_seven   [6], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2], 
+                output_a_rotated_left[6]);
+
+MUX8 OUTPUT7MUXrotateleft (input_a  [7], // 3'b000
+                rotate_left_one     [7], // 3'b001
+                rotate_left_two     [7], // 3'b010
+                rotate_left_three   [7], // 3'b011
+                rotate_left_four    [7], // 3'b100
+                rotate_left_five    [7], // 3'b101
+                rotate_left_six     [7], // 3'b110
+                rotate_left_seven   [7], // 3'b111
+                input_b[0],
+                input_b[1],
+                input_b[2],
+                output_a_rotated_left[7]);
+
+endmodule
+
+// 12 to one mux
+
+module MUX16 (
+        mux16_input,
+        mux16_output,
+        mux16_control
+        );
+input   [15:0]  mux16_input;
+input   [3:0]   mux16_control;
+
+output          mux16_output;
+
+wire    [7:0]   mux16_internal_L0;  // internal variables wiring previous mux2 to next mux2, layer 0
+wire    [3:0]   mux16_internal_L1;  // internal variables wiring previous mux2 to next mux2, layer 1
+wire    [1:0]   mux16_internal_L2;  // internal variables wiring previous mux2 to next mux2, layer 2
+
+MUX2 MUX16_L0_0         (mux16_input[0],    mux16_input[1],     mux16_control[0],   mux16_internal_L0[0]);
+MUX2 MUX16_L0_1         (mux16_input[2],    mux16_input[3],     mux16_control[0],   mux16_internal_L0[1]);
+MUX2 MUX16_L0_2         (mux16_input[4],    mux16_input[5],     mux16_control[0],   mux16_internal_L0[2]);
+MUX2 MUX16_L0_3         (mux16_input[6],    mux16_input[7],     mux16_control[0],   mux16_internal_L0[3]);
+MUX2 MUX16_L0_4         (mux16_input[8],    mux16_input[9],     mux16_control[0],   mux16_internal_L0[4]);
+MUX2 MUX16_L0_5         (mux16_input[10],   mux16_input[11],    mux16_control[0],   mux16_internal_L0[5]);
+MUX2 MUX16_L0_6         (mux16_input[12],   mux16_input[13],    mux16_control[0],   mux16_internal_L0[6]);
+MUX2 MUX16_L0_7         (mux16_input[14],   mux16_input[15],    mux16_control[0],   mux16_internal_L0[7]);
+
+MUX2 MUX16_L1_0         (mux16_internal_L0[0],  mux16_internal_L0[1],   mux16_control[1],   mux16_internal_L1[0]);
+MUX2 MUX16_L1_1         (mux16_internal_L0[2],  mux16_internal_L0[3],   mux16_control[1],   mux16_internal_L1[1]);
+MUX2 MUX16_L1_2         (mux16_internal_L0[4],  mux16_internal_L0[5],   mux16_control[1],   mux16_internal_L1[2]);
+MUX2 MUX16_L1_3         (mux16_internal_L0[6],  mux16_internal_L0[7],   mux16_control[1],   mux16_internal_L1[3]);
+
+MUX2 MUX16_L2_0         (mux16_internal_L1[0],  mux16_internal_L1[1],   mux16_control[2],   mux16_internal_L2[0]);
+MUX2 MUX16_L2_1         (mux16_internal_L1[2],  mux16_internal_L1[3],   mux16_control[2],   mux16_internal_L2[1]);
+
+MUX2 MUX16_outputMUX2   (mux16_internal_L2[0],  mux16_internal_L2[0],   mux16_control[3],   mux16_output);
+
+endmodule
+
