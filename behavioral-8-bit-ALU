@@ -11,7 +11,7 @@ module JLapane_ALU8_behavioral
     );
 
 input   [7:0]   input_a_bhv, input_b_bhv;
-input   [3:0]   control;
+input   [3:0]   control_bhv;
 
 input           clk;
 
@@ -20,22 +20,24 @@ output  [7:0]   top_bhv_output;
 reg top_bhv_output;
 
 always @ (posedge clk) begin
-    if (control == 4'b0000 or 4'b0101 or 4'b0110 or 4'b0111) top_bhv_output = 8'b0000_0000;
-    else 
-    case (control)
+    if (control_bhv == 4'b0000) top_bhv_output = 8'b00000000;
+    else if (control_bhv == 4'b0101) top_bhv_output = 8'b00000000;
+    else if (control_bhv == 4'b0110) top_bhv_output = 8'b00000000;
+    else if (control_bhv == 4'b0111) top_bhv_output = 8'b00000000;
+    else
+    case (control_bhv)
     4'b0001: top_bhv_output = input_a_bhv + input_b_bhv;
     4'b0010: top_bhv_output = input_a_bhv - input_b_bhv;
     4'b0011: top_bhv_output = input_b_bhv - input_a_bhv;
     4'b0100: top_bhv_output = input_a_bhv [7:4] * input_b_bhv [7:4];
     4'b1000: top_bhv_output = ~(input_a_bhv | input_b_bhv);   //! or ~? bitwise nor
-    4'b0001: top_bhv_output = ~input_b_bhv;                 //bitwise not
-    4'b0001: top_bhv_output = ~(input_a_bhv & input_b_bhv); //bitwise nand
-    4'b0001: top_bhv_output = input_a_bhv ~^ input_b_bhv;    //bitwise xnor
-    4'b0001: top_bhv_output = input_a_bhv >>  input_b_bhv [2:0];    //srl
-    4'b0001: top_bhv_output = input_a_bhv << input_b_bhv [2:0];    //sll
-    4'b0001: top_bhv_output = (input_a_bhv >> input_b_bhv [2:0]) | (input_a_bhv << (3'b111 - input_b_bhv [2:0]));    //ror
-    4'b0001: top_bhv_output = (input_a_bhv << input_b_bhv [2:0]) | (input_a_bhv >> (3'b111 - input_b_bhv [2:0]));    //rol
+    4'b1001: top_bhv_output = ~input_b_bhv;                 //bitwise not
+    4'b1010: top_bhv_output = ~(input_a_bhv & input_b_bhv); //bitwise nand
+    4'b1011: top_bhv_output = input_a_bhv ~^ input_b_bhv;    //bitwise xnor
+    4'b1100: top_bhv_output = input_a_bhv >>  input_b_bhv [2:0];    //srl
+    4'b1101: top_bhv_output = input_a_bhv << input_b_bhv [2:0];    //sll
+    4'b1110: top_bhv_output = (input_a_bhv >> input_b_bhv [2:0]) | (input_a_bhv << (3'b111 - input_b_bhv [2:0]));    //ror
+    4'b1111: top_bhv_output = (input_a_bhv << input_b_bhv [2:0]) | (input_a_bhv >> (3'b111 - input_b_bhv [2:0]));    //rol
     endcase
 end
-
 endmodule
