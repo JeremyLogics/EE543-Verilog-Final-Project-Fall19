@@ -17,7 +17,7 @@ input           clk;
 
 output  [7:0]   top_bhv_output;
 
-reg top_bhv_output;
+reg 	[7:0]	top_bhv_output;
 
 always @ (posedge clk) begin
     if (control_bhv == 4'b0000) top_bhv_output = 8'b00000000;
