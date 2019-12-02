@@ -115,171 +115,171 @@ Rotate_Left ROL_top (input_a_top, input_b_top, rol_out);
 
 //  mod    name             output          control  
     MUX16   TopMux_0        (
-                            {1'b0,           //0000 control signal not used
-                            add_out [0],     //0001
-                            sub_out [0],     //0010
-                            rsb_out [0],     //0011
-                            mul_out [0],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [0],     //1000
-                            not_out [0],     //1001
-                            nand_out[0],     //1010
-                            xnor_out[0],     //1011
-                            srl_out [0],     //1100
-                            sll_out [0],     //1101
+                            {rol_out [0],    //1111 control signal not used
                             ror_out [0],     //1110
-                            rol_out [0]},    //1111
+                            sll_out [0],     //1101
+                            srl_out [0],     //1100
+                            xnor_out[0],     //1011
+                            nand_out[0],     //1010 control signal not used
+                            not_out [0],     //1001 control signal not used
+                            nor_out [0],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,     		 //0110
+                            1'b0,     		 //0101
+                            mul_out [0],     //0100
+                            rsb_out [0],     //0011
+                            sub_out [0],     //0010
+                            add_out [0],     //0001
+                            1'b0},    		 //0000
                             output_top[0],
-                            control [3:0]
+                            control
                             );
 
     MUX16   TopMux_1        (
-                            {1'b0,            //0000 control signal not used
-                            add_out [1],     //0001
-                            sub_out [1],     //0010
-                            rsb_out [1],     //0011
-                            mul_out [1],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [1],     //1000
-                            not_out [1],     //1001
-                            nand_out[1],     //1010
-                            xnor_out[1],     //1011
-                            srl_out [1],     //1100
-                            sll_out [1],     //1101
+                            {rol_out[1],     //1111 control signal not used
                             ror_out [1],     //1110
-                            rol_out [1]},     //1111
+                            sll_out [1],     //1101
+                            srl_out [1],     //1100
+                            xnor_out[1],     //1011
+                            nand_out[1],     //1010 control signal not used
+                            not_out [1],     //1001 control signal not used
+                            nor_out [1],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,            //0110
+                            1'b0,            //0101
+                            mul_out [1],     //0100
+                            rsb_out [1],     //0011
+                            sub_out [1],     //0010
+                            add_out [1],     //0001
+                            1'b0},     //1111
                             output_top[1],
-                            control [3:0]
+                            control
                             );
 
     MUX16   TopMux_2        (
-                            {1'b0,            //0000 control signal not used
-                            add_out [2],     //0001
-                            sub_out [2],     //0010
-                            rsb_out [2],     //0011
-                            mul_out [2],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [2],     //1000
-                            not_out [2],     //1001
-                            nand_out[2],     //1010
-                            xnor_out[2],     //1011
-                            srl_out [2],     //1100
-                            sll_out [2],     //1101
+                            {rol_out[2],     //1111 control signal not used
                             ror_out [2],     //1110
-                            rol_out [2]},     //1111
+                            sll_out [2],     //1101
+                            srl_out [2],     //1100
+                            xnor_out[2],     //1011
+                            nand_out[2],     //1010 control signal not used
+                            not_out [2],     //1001 control signal not used
+                            nor_out [2],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,            //0110
+                            1'b0,            //0101
+                            mul_out [2],     //0100
+                            rsb_out [2],     //0011
+                            sub_out [2],     //0010
+                            add_out [2],     //0001
+                            1'b0},     //1111
                             output_top[2],
-                            control [3:0]
+                            control
                             );
 
     MUX16   TopMux_3        (
-                            {1'b0,            //0000 control signal not used
-                            add_out [3],     //0001
-                            sub_out [3],     //0010
-                            rsb_out [3],     //0011
-                            mul_out [3],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [3],     //1000
-                            not_out [3],     //1001
-                            nand_out[3],     //1010
-                            xnor_out[3],     //1011
-                            srl_out [3],     //1100
-                            sll_out [3],     //1101
+                            {rol_out[3],    //1111 control signal not used
                             ror_out [3],     //1110
-                            rol_out [3]},     //1111
+                            sll_out [3],     //1101
+                            srl_out [3],     //1100
+                            xnor_out[3],     //1011
+                            nand_out[3],     //1010 control signal not used
+                            not_out [3],     //1001 control signal not used
+                            nor_out [3],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,            //0110
+                            1'b0,            //0101
+                            mul_out [3],     //0100
+                            rsb_out [3],     //0011
+                            sub_out [3],     //0010
+                            add_out [3],     //0001
+                            1'b0},     //1111
                             output_top[3],
-                            control [3:0]
+                            control
                             );
 
     MUX16   TopMux_4        (
-                            {1'b0,            //0000 control signal not used
-                            add_out [4],     //0001
-                            sub_out [4],     //0010
-                            rsb_out [4],     //0011
-                            mul_out [4],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [4],     //1000
-                            not_out [4],     //1001
-                            nand_out[4],     //1010
-                            xnor_out[4],     //1011
-                            srl_out [4],     //1100
-                            sll_out [4],     //1101
+                            {rol_out[4],    //1111 control signal not used
                             ror_out [4],     //1110
-                            rol_out [4]},     //1111
+                            sll_out [4],     //1101
+                            srl_out [4],     //1100
+                            xnor_out[4],     //1011
+                            nand_out[4],     //1010 control signal not used
+                            not_out [4],     //1001 control signal not used
+                            nor_out [4],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,            //0110
+                            1'b0,            //0101
+                            mul_out [4],     //0100
+                            rsb_out [4],     //0011
+                            sub_out [4],     //0010
+                            add_out [4],     //0001
+                            1'b0},     //1111
                             output_top[4],
-                            control [3:0]
+                            control
                             );                                                                                    
 
     MUX16   TopMux_5        (
-                            {1'b0,            //0000 control signal not used
-                            add_out [5],     //0001
-                            sub_out [5],     //0010
-                            rsb_out [5],     //0011
-                            mul_out [5],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [5],     //1000
-                            not_out [5],     //1001
-                            nand_out[5],     //1010
-                            xnor_out[5],     //1011
-                            srl_out [5],     //1100
-                            sll_out [5],     //1101
+                            {rol_out[5],    //1111 control signal not used
                             ror_out [5],     //1110
-                            rol_out [5]},     //1111
+                            sll_out [5],     //1101
+                            srl_out [5],     //1100
+                            xnor_out[5],     //1011
+                            nand_out[5],     //1010 control signal not used
+                            not_out [5],     //1001 control signal not used
+                            nor_out [5],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,            //0110
+                            1'b0,            //0101
+                            mul_out [5],     //0100
+                            rsb_out [5],     //0011
+                            sub_out [5],     //0010
+                            add_out [5],     //0001
+                            1'b0},     //1111
                             output_top[5],
-                            control [3:0]
+                            control
                             );
 
     MUX16   TopMux_6        (
-                            {1'b0,            //0000 control signal not used
-                            add_out [6],     //0001
-                            sub_out [6],     //0010
-                            rsb_out [6],     //0011
-                            mul_out [6],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [6],     //1000
-                            not_out [6],     //1001
-                            nand_out[6],     //1010
-                            xnor_out[6],     //1011
-                            srl_out [6],     //1100
-                            sll_out [6],     //1101
+                            {rol_out[6],    //1111 control signal not used
                             ror_out [6],     //1110
-                            rol_out [6]},     //1111
+                            sll_out [6],     //1101
+                            srl_out [6],     //1100
+                            xnor_out[6],     //1011
+                            nand_out[6],     //1010 control signal not used
+                            not_out [6],     //1001 control signal not used
+                            nor_out [6],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,            //0110
+                            1'b0,            //0101
+                            mul_out [6],     //0100
+                            rsb_out [6],     //0011
+                            sub_out [6],     //0010
+                            add_out [6],     //0001
+                            1'b0},     //1111
                             output_top[6],
-                            control [3:0]
+                            control
                             );
 
     MUX16   TopMux_7        (
-                            {1'b0,            //0000 control signal not used
-                            add_out [7],     //0001
-                            sub_out [7],     //0010
-                            rsb_out [7],     //0011
-                            mul_out [7],     //0100
-                            1'b0,            //0101 control signal not used
-                            1'b0,            //0110 control signal not used
-                            1'b0,            //0111 control signal not used
-                            nor_out [7],     //1000
-                            not_out [7],     //1001
-                            nand_out[7],     //1010
-                            xnor_out[7],     //1011
-                            srl_out [7],     //1100
-                            sll_out [7],     //1101
+                            {rol_out[7],    //1111 control signal not used
                             ror_out [7],     //1110
-                            rol_out [7]},     //1111
+                            sll_out [7],     //1101
+                            srl_out [7],     //1100
+                            xnor_out[7],     //1011
+                            nand_out[7],     //1010 control signal not used
+                            not_out [7],     //1001 control signal not used
+                            nor_out [7],     //1000 control signal not used
+                            1'b0,            //0111
+                            1'b0,            //0110
+                            1'b0,            //0101
+                            mul_out [7],     //0100
+                            rsb_out [7],     //0011
+                            sub_out [7],     //0010
+                            add_out [7],     //0001
+                            1'b0},     //1111
                             output_top[7],
-                            control [3:0]
+                            control
                             );                                                        
 
 endmodule
