@@ -1,0 +1,9 @@
+This folder contains the modules used in the original gate level work, but in separate files. 
+
+additional work to do as of 12/10/19:
+1. Redesign shifter/rotator to use gates and decoder with 8 muxes
+2. Verify each module individually in Vivado
+3. Work on delay of ALU
+4. work on power consumption
+5. Floating point unit gate level module
+6. signed multiplier
